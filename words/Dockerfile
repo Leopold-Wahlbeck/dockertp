@@ -8,3 +8,6 @@ COPY src ./src
 RUN mvn package
 
 CMD ["sh", "-c", "exec java ${JAVA_OPTS:--Xms64m -Xmx256m} -jar target/words.jar"]
+
+EXPOSE 8080
+

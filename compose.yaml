@@ -1,0 +1,44 @@
+services:
+  db:
+    build: ./db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  words:
+    build: ./words
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  web:
+    build: ./web
+    ports:
+      - "80:80"
+    depends_on:
+      - words
+    volumes:
+      - ./web/static:/app/static:ro
+
+  narrative:
+    build: ./narrative
+    ports:
+      - "8181:8181"
+    depends_on:
+      - words
+      - db
+    extra_hosts:
+      - "model-runner.docker.internal:host-gateway"
+    models:
+      - llm
+
+models:
+  llm:
+    model: ai/smollm2
+
+volumes:
+  db_data:
